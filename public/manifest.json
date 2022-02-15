@@ -1,6 +1,6 @@
 {
   "short_name": "PWA",
-  "name": "PWA Sample",
+  "name": "PWA Client",
   "icons": [
     {
       "src": "favicon.ico",
