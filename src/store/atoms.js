@@ -9,3 +9,8 @@ export const chatLogState = atom({
    key: 'chatLogState',
    default: [],
 });
+
+export const messagesState = atom({
+   key: 'messagesState',
+   default: [],
+});

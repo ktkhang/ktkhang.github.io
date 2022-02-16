@@ -10,7 +10,7 @@ const LoginForm = () => {
    const login = useCallback(async () => {
       if (!name.trim()) return;
       const response = await userService.login({
-         name,
+         name: name.trim(),
       });
       if (response.errorCode === 0) {
          setUserInfo(response.data);

@@ -1,4 +1,5 @@
 import { DEVICE_ID_VARIABLE } from '../constants/variables';
+import moment from 'moment-timezone';
 
 export const getDeviceId = async () => {
    const savedDeviceId = localStorage[DEVICE_ID_VARIABLE];
@@ -23,4 +24,12 @@ export const uuidv4 = () => {
          v = c == 'x' ? r : (r & 0x3) | 0x8;
       return v.toString(16);
    });
+};
+
+export const getTimeZone = () => {
+   return moment.tz.guess();
+};
+
+export const displayTime = (isoString) => {
+   return moment(isoString).tz(getTimeZone()).format('MMM DD, YYYY hh:mm A');
 };

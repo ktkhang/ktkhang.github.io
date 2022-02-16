@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import useSocketMessageHandler from '../hooks/useSocketMessageHandler';
 import { getSavedDeviceId } from '../utils/common';
 import socket from '../utils/socket';
+import ChatBox from './ChatBox';
+import ChatContent from './ChatContent';
 import ChatLog from './ChatLog';
 
 const Main = () => {
@@ -19,8 +21,13 @@ const Main = () => {
 
    return (
       <div className="main">
-         <div className="main__header">{/* <h2>Global Chat</h2> */}</div>
-         <div className="main__body"></div>
+         <div className="main__header">
+            <h2>Chat</h2>
+         </div>
+         <div className="main__body">
+            <ChatContent />
+            <ChatBox />
+         </div>
          <ChatLog />
       </div>
    );

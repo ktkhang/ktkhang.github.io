@@ -5,6 +5,7 @@ import { getDeviceId } from './utils/common';
 import { useRecoilState } from 'recoil';
 import { userInfoState } from './store/atoms';
 import Main from './components/Main';
+import './scss/styles.scss';
 
 const App = () => {
    // useEffect(() => {

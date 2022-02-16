@@ -27,15 +27,13 @@ const connect = (deviceId) => {
 };
 
 const emit = (event, payload) => {
-   console.log(event);
-   console.log(payload);
-   switch (event) {
-      case '':
-         break;
-
-      default:
-         break;
-   }
+   if (!websocket) return false;
+   websocket.send(
+      JSON.stringify({
+         type: event,
+         payload,
+      })
+   );
 };
 
 const socket = {
