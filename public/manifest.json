@@ -1,6 +1,6 @@
 {
-  "short_name": "PWA",
-  "name": "PWA Client",
+  "short_name": "Global Chat",
+  "name": "Global Chat",
   "icons": [
     {
       "src": "favicon.ico",

@@ -2,14 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import { RecoilRoot } from 'recoil';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+   <React.StrictMode>
+      <RecoilRoot>
+         <App />
+      </RecoilRoot>
+   </React.StrictMode>,
+   document.getElementById('root')
 );
 
 serviceWorkerRegistration.register();
