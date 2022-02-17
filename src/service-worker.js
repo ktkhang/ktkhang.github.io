@@ -97,32 +97,33 @@ const RESET_PENDING_MESSAGES = 'reset_pending_messages';
 self.addEventListener('sync', (event) => {
    if (event.tag === SYNC_PENDING_MESSAGE_TAG) {
       console.log('SYNC_PENDING_MESSAGE_TAG');
-      event.waitUntil(async () => {
-         console.log('oke');
+      event.waitUntil(
+         (async () => {
+            console.log('oke');
+            const deviceId = await localforage.getItem(DEVICE_ID_VARIABLE);
+            const msgs = await localforage.getItem(SYNC_PENDING_MESSAGE_TAG);
+            if (deviceId && msgs?.length) {
+               const pendingMessages = msgs.map((msg) => msg.content);
+               const response = await sendPendingMessages(deviceId, pendingMessages);
+               if (response.errorCode === 0) {
+                  console.log('sync success');
 
-         // const deviceId = await localforage.getItem(DEVICE_ID_VARIABLE);
-         // const msgs = await localforage.getItem(SYNC_PENDING_MESSAGE_TAG);
-         // if (deviceId && msgs?.length) {
-         //    const pendingMessages = msgs.map((msg) => msg.content);
-         //    const response = await sendPendingMessages(deviceId, pendingMessages);
-         //    if (response.errorCode === 0) {
-         //       console.log('sync success');
+                  if (!event.clientId) return;
+                  console.log(self.clients);
+                  self.clients.matchAll().then(async (clients) => {
+                     console.log(clients);
+                     const client = await clients.get(event.clientId);
+                     console.log(client);
+                     if (!client) return;
 
-         //       if (!event.clientId) return;
-         //       console.log(self.clients);
-         //       self.clients.matchAll().then(async (clients) => {
-         //          console.log(clients);
-         //          const client = await clients.get(event.clientId);
-         //          console.log(client);
-         //          if (!client) return;
-
-         //          // Send a message to the client.
-         //          client.postMessage({
-         //             msg: RESET_PENDING_MESSAGES,
-         //          });
-         //       });
-         //    }
-         // }
-      });
+                     // Send a message to the client.
+                     client.postMessage({
+                        msg: RESET_PENDING_MESSAGES,
+                     });
+                  });
+               }
+            }
+         })()
+      );
    }
 });
