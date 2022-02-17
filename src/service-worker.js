@@ -111,24 +111,13 @@ self.addEventListener('sync', (event) => {
                const clientId = await localforage.getItem(CLIENT_ID);
                const response = await sendPendingMessages(deviceId, pendingMessages);
                if (response.errorCode === 0) {
-                  console.log(clientId);
                   if (!clientId) return;
-                  console.log(self.clients);
                   self.clients.get(clientId).then((client) => {
-                     // do something with your returned client
                      console.log(client);
-                     // Send a message to the client.
                      client.postMessage({
                         msg: RESET_PENDING_MESSAGES,
                      });
                   });
-                  // self.clients.matchAll().then(async (clients) => {
-                  //    console.log(clients);
-                  //    const client = await clients.get(clientId);
-                  //    console.log(client);
-                  //    if (!client) return;
-
-                  // });
                }
             }
          })()
