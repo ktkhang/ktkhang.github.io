@@ -10,19 +10,9 @@ const close = () => {
    websocket && websocket.close();
 };
 
-const connect = (deviceId) => {
+const connect = () => {
    if (websocket) return websocket;
    websocket = new WebSocket(config.SOCKET_URL);
-   websocket.onopen = (e) => {
-      websocket.send(
-         JSON.stringify({
-            type: 'joined',
-            payload: {
-               deviceId,
-            },
-         })
-      );
-   };
    return websocket;
 };
 

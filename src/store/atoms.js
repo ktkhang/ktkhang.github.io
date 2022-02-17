@@ -14,3 +14,15 @@ export const messagesState = atom({
    key: 'messagesState',
    default: [],
 });
+
+export const pendingMessagesState = atom({
+   key: 'pendingMessagesState',
+   default: [],
+});
+
+export const socketState = atom({
+   key: 'socketState',
+   default: {
+      errorCode: 0,
+   },
+});

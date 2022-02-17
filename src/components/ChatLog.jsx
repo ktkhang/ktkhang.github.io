@@ -5,7 +5,6 @@ import { displayTime } from '../utils/common';
 
 const ChatLog = memo(() => {
    const chatLog = useRecoilValue(chatLogState);
-   console.log(chatLog);
 
    return (
       <div className="main__log">

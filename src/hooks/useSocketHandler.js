@@ -1,10 +1,12 @@
 import { useSetRecoilState } from 'recoil';
-import { chatLogState, messagesState } from '../store/atoms';
-import { uuidv4 } from '../utils/common';
+import { chatLogState, messagesState, socketState } from '../store/atoms';
+import { getSavedDeviceId, uuidv4 } from '../utils/common';
 
-const useSocketMessageHandler = () => {
+const useSocketHandler = () => {
    const setChatLogState = useSetRecoilState(chatLogState);
    const setMessagesState = useSetRecoilState(messagesState);
+   const setSocketState = useSetRecoilState(socketState);
+   const deviceId = getSavedDeviceId();
 
    const _handleUserJoined = (payload) => {
       const { user, time } = payload;
@@ -12,7 +14,9 @@ const useSocketMessageHandler = () => {
          ...prev,
          {
             id: uuidv4(),
-            msg: `"${user.name || 'Anonymous'}" have joined the chat.`,
+            msg: `${
+               deviceId === user.deviceId ? 'You' : `"${user.name || 'Anonymous'}"`
+            } have joined the chat.`,
             time,
          },
       ]);
@@ -54,9 +58,36 @@ const useSocketMessageHandler = () => {
       }
    };
 
+   // handle connection open
+   const handleOpen = (websocket) => (e) => {
+      websocket.send(
+         JSON.stringify({
+            type: 'joined',
+            payload: {
+               deviceId,
+            },
+         })
+      );
+      setSocketState((prev) => ({ ...prev, errorCode: 0 }));
+   };
+
+   // handle connection close
+   const handleClose = (e) => {
+      console.log(e);
+      setSocketState((prev) => ({ ...prev, errorCode: e.code !== 1005 ? e.code : 0 }));
+   };
+
+   // handle error
+   const handleError = (e) => {
+      console.log(e);
+   };
+
    return {
+      handleOpen,
+      handleClose,
       handleMessage,
+      handleError,
    };
 };
 
-export default useSocketMessageHandler;
+export default useSocketHandler;
