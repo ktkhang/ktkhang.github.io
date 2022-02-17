@@ -114,17 +114,21 @@ self.addEventListener('sync', (event) => {
                   console.log(clientId);
                   if (!clientId) return;
                   console.log(self.clients);
-                  self.clients.matchAll().then(async (clients) => {
-                     console.log(clients);
-                     const client = await clients.get(clientId);
+                  self.clients.get(clientId).then((client) => {
+                     // do something with your returned client
                      console.log(client);
-                     if (!client) return;
-
                      // Send a message to the client.
                      client.postMessage({
                         msg: RESET_PENDING_MESSAGES,
                      });
                   });
+                  // self.clients.matchAll().then(async (clients) => {
+                  //    console.log(clients);
+                  //    const client = await clients.get(clientId);
+                  //    console.log(client);
+                  //    if (!client) return;
+
+                  // });
                }
             }
          })()
