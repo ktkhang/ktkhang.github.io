@@ -3,14 +3,14 @@ import { chatLogState, messagesState, socketState } from '../store/atoms';
 import { getSavedDeviceId, uuidv4 } from '../utils/common';
 
 const useSocketHandler = () => {
-   const setChatLogState = useSetRecoilState(chatLogState);
-   const setMessagesState = useSetRecoilState(messagesState);
+   const setChatLog = useSetRecoilState(chatLogState);
+   const setMessages = useSetRecoilState(messagesState);
    const setSocketState = useSetRecoilState(socketState);
    const deviceId = getSavedDeviceId();
 
    const _handleUserJoined = (payload) => {
       const { user, time } = payload;
-      setChatLogState((prev) => [
+      setChatLog((prev) => [
          ...prev,
          {
             id: uuidv4(),
@@ -24,7 +24,7 @@ const useSocketHandler = () => {
 
    const _handleUserLeft = (payload) => {
       const { name, time } = payload;
-      setChatLogState((prev) => [
+      setChatLog((prev) => [
          ...prev,
          {
             id: uuidv4(),
@@ -35,7 +35,7 @@ const useSocketHandler = () => {
    };
 
    const _handleMessage = (payload) => {
-      setMessagesState((prev) => [...prev, { ...payload }]);
+      setMessages((prev) => [...prev, ...payload]);
    };
 
    // handle message

@@ -55,6 +55,12 @@ const BackgroundSync = memo(() => {
          loadDataFromServer();
       };
       init();
+      navigator.serviceWorker.addEventListener('message', (event) => {
+         console.log(event);
+         if (event.data.msg === 'reset_pending_messages') {
+            setPendingMessages([]);
+         }
+      });
 
       return () => {
          if (syncTimeout.current) {
@@ -78,11 +84,13 @@ const BackgroundSync = memo(() => {
    useEffect(() => {
       if (hasPendingMessagesChanged) {
          localforage.setItem(SYNC_PENDING_MESSAGE_TAG, pendingMessages).then(async () => {
-            const registration = await navigator.serviceWorker.ready;
-            try {
-               await registration.sync.register(SYNC_PENDING_MESSAGE_TAG);
-            } catch {
-               console.log('Background Sync could not be registered!');
+            if (pendingMessages.length) {
+               const registration = await navigator.serviceWorker.ready;
+               try {
+                  await registration.sync.register(SYNC_PENDING_MESSAGE_TAG);
+               } catch {
+                  console.log('Background Sync could not be registered.');
+               }
             }
          });
       }

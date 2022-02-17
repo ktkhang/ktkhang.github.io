@@ -10,7 +10,7 @@ const send = (msg) => {
       },
       body: JSON.stringify({
          deviceId,
-         msg,
+         messages: [msg],
       }),
    })
       .then((response) => response.json())
