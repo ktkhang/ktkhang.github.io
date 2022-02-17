@@ -14,7 +14,7 @@ import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
 
-self.importScripts('/localforage-1.10.0.min.js');
+importScripts('/localforage-1.10.0.min.js');
 
 clientsClaim();
 
