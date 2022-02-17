@@ -14,7 +14,7 @@
 // import { registerRoute } from 'workbox-routing';
 // import { StaleWhileRevalidate } from 'workbox-strategies';
 
-import('./localforage-1.10.0.min.js');
+importScripts('/localforage-1.10.0.min.js');
 
 // clientsClaim();
 
