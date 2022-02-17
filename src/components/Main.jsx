@@ -30,7 +30,7 @@ const Main = () => {
    return (
       <div className="main">
          <div className="main__header">
-            <h2>Chat</h2>
+            <h2>Global Chat</h2>
          </div>
          <div className="main__body">
             {errorCode !== 0 && (

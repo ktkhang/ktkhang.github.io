@@ -50,22 +50,23 @@ const BackgroundSync = memo(() => {
    };
 
    useEffect(() => {
+      const handleSwPostMessage = (e) => {
+         if (e.data.msg === 'reset_pending_messages') {
+            setPendingMessages([]);
+         }
+      };
       const init = async () => {
          await loadDataFromLocal();
          loadDataFromServer();
       };
       init();
-      navigator.serviceWorker.addEventListener('message', (event) => {
-         console.log(event);
-         if (event.data.msg === 'reset_pending_messages') {
-            setPendingMessages([]);
-         }
-      });
+      navigator.serviceWorker.addEventListener('message', handleSwPostMessage);
 
       return () => {
          if (syncTimeout.current) {
             clearTimeout(syncTimeout.current);
          }
+         navigator.serviceWorker.removeEventListener('message', handleSwPostMessage);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);

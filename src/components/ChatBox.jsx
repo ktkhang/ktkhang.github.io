@@ -1,7 +1,7 @@
 import React, { memo, useState } from 'react';
 import { messageService } from '../services/messageService';
-import { useSetRecoilState } from 'recoil';
-import { pendingMessagesState } from '../store/atoms';
+import { useSetRecoilState, useRecoilValue } from 'recoil';
+import { pendingMessagesState, userInfoState } from '../store/atoms';
 import { getSavedDeviceId, uuidv4 } from '../utils/common';
 // import { getSavedDeviceId } from '../utils/common';
 // import socket from '../utils/socket';
@@ -9,6 +9,7 @@ import { getSavedDeviceId, uuidv4 } from '../utils/common';
 const ChatBox = memo(() => {
    const [msg, setMsg] = useState('');
    const setPendingMessages = useSetRecoilState(pendingMessagesState);
+   const userInfo = useRecoilValue(userInfoState);
 
    const sendMessage = async () => {
       if (!msg.trim()) return;
@@ -31,6 +32,7 @@ const ChatBox = memo(() => {
                   deviceId,
                   content: msg.trim(),
                   sendAt: new Date(),
+                  sender: { ...(userInfo || {}) },
                },
             ]);
          }
