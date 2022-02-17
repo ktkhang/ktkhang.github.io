@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-restricted-globals */
-importScripts('/localforage-1.10.0.min.js');
+import { precacheAndRoute } from 'workbox-precaching';
+precacheAndRoute(self.__WB_MANIFEST);
 
 const sendPendingMessages = (deviceId, messages) => {
    return fetch('http://127.0.0.1:8080/message/send', {
