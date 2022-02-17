@@ -1,7 +1,13 @@
-/* eslint-disable no-undef */
 /* eslint-disable no-restricted-globals */
-import { precacheAndRoute } from 'workbox-precaching';
-precacheAndRoute(self.__WB_MANIFEST);
+/* eslint-disable no-undef */
+'use strict';
+
+self.importScripts('/localforage-1.10.0.min.js');
+
+self.addEventListener('activate', function (event) {
+   console.log('Claiming control');
+   return self.clients.claim();
+});
 
 const sendPendingMessages = (deviceId, messages) => {
    return fetch('http://127.0.0.1:8080/message/send', {
@@ -28,20 +34,20 @@ const RESET_PENDING_MESSAGES = 'reset_pending_messages';
 self.addEventListener('sync', (event) => {
    if (event.tag === SYNC_PENDING_MESSAGE_TAG) {
       console.log('SYNC_PENDING_MESSAGE_TAG');
-      function readDB() {
-         idb.open('localforage', 1)
-            .then(function (db) {
-               var tx = db.transaction(['keyvaluepairs'], 'readonly');
-               var store = tx.objectStore('keyvaluepairs');
-               return store.getAll();
-            })
-            .then(function (items) {
-               // Use beverage data
-               console.log(items);
-            });
-      }
-      console.log('readDB');
-      readDB();
+      // function readDB() {
+      //    idb.open('localforage', 1)
+      //       .then(function (db) {
+      //          var tx = db.transaction(['keyvaluepairs'], 'readonly');
+      //          var store = tx.objectStore('keyvaluepairs');
+      //          return store.getAll();
+      //       })
+      //       .then(function (items) {
+      //          // Use beverage data
+      //          console.log(items);
+      //       });
+      // }
+      // console.log('readDB');
+      // readDB();
 
       event.waitUntil(async () => {
          console.log('okkk');

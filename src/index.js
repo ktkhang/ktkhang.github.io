@@ -15,7 +15,26 @@ ReactDOM.render(
    document.getElementById('root')
 );
 
-serviceWorkerRegistration.register();
+// serviceWorkerRegistration.register();
+
+if ('serviceWorker' in navigator) {
+   navigator.serviceWorker
+      .register('/service-worker.js', {
+         scope: '/',
+      })
+      .then((reg) => {
+         if (reg.installing) {
+            console.log('Service worker installing');
+         } else if (reg.waiting) {
+            console.log('Service worker installed');
+         } else if (reg.active) {
+            console.log('Service worker active');
+         }
+      })
+      .catch((e) => {
+         console.log('Registration failed with ' + e);
+      });
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
