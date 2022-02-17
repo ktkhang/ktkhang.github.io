@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import { RecoilRoot } from 'recoil';
 import reportWebVitals from './reportWebVitals';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+// import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 ReactDOM.render(
    <React.StrictMode>
@@ -19,9 +19,7 @@ ReactDOM.render(
 
 if ('serviceWorker' in navigator) {
    navigator.serviceWorker
-      .register('/service-worker.js', {
-         scope: '/',
-      })
+      .register('./service-worker.js')
       .then((reg) => {
          if (reg.installing) {
             console.log('Service worker installing');
