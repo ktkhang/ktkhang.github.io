@@ -2,7 +2,7 @@ import { config } from '../constants/confjg';
 
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-const HOST = config.API_URL.replace(/^(https|http)/, 'ws') + '/ws';
+const HOST = config.API_URL.replace(/^http/, 'ws') + '/ws';
 
 let websocket;
 
