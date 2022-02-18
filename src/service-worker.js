@@ -125,6 +125,17 @@ self.addEventListener('sync', (event) => {
                   const response = await sendPendingMessages(deviceId, pendingMessages);
                   if (response && response.errorCode === 0) {
                      console.log('resend success');
+                     // Let the user know, if they granted permissions before.
+                     self.registration.showNotification(`Messages synced`, {
+                        icon: '/logo192.png',
+                        body: 'Your messages have been synced.',
+                        actions: [
+                           {
+                              action: 'view-details',
+                              title: 'Open app',
+                           },
+                        ],
+                     });
                      if (!clientId) return;
                      self.clients.get(clientId).then((client) => {
                         client.postMessage({
