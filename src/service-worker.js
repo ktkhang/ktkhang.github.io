@@ -129,12 +129,9 @@ self.addEventListener('sync', (event) => {
                      self.registration.showNotification(`Messages synced`, {
                         icon: '/logo192.png',
                         body: 'Your messages have been synced.',
-                        actions: [
-                           {
-                              action: 'view-details',
-                              title: 'Open app',
-                           },
-                        ],
+                        data: {
+                           url: 'https://ktkhang.github.io',
+                        },
                      });
                      if (!clientId) return;
                      self.clients.get(clientId).then((client) => {
@@ -147,5 +144,24 @@ self.addEventListener('sync', (event) => {
             }, 500);
          }
       })()
+   );
+});
+
+self.addEventListener('notificationclick', function (event) {
+   let url = event.notification.data.url;
+   event.notification.close();
+   event.waitUntil(
+      clients.matchAll({ type: 'window' }).then((windowClients) => {
+         for (var i = 0; i < windowClients.length; i++) {
+            var client = windowClients[i];
+            console.log(client.url);
+            if (client.url === url && 'focus' in client) {
+               return client.focus();
+            }
+         }
+         if (clients.openWindow) {
+            return clients.openWindow(url);
+         }
+      })
    );
 });
