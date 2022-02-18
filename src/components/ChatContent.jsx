@@ -4,6 +4,7 @@ import IconClock from '../icons/IconClock';
 import IconUser from '../icons/IconUser';
 import { messagesState, pendingMessagesState } from '../store/atoms';
 import { displayTime, getSavedDeviceId } from '../utils/common';
+import TypingUsersDisplay from './TypingUsersDisplay';
 
 const ChatContent = memo(() => {
    const messages = useRecoilValue(messagesState);
@@ -44,6 +45,7 @@ const ChatContent = memo(() => {
                />
             );
          })}
+         <TypingUsersDisplay />
          <div ref={messagesBottomRef} />
       </div>
    );

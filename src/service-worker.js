@@ -130,7 +130,7 @@ self.addEventListener('sync', (event) => {
                         icon: '/logo192.png',
                         body: 'Your messages have been synced.',
                         data: {
-                           url: 'https://ktkhang.github.io',
+                           url: 'https://ktkhang.github.io/',
                         },
                      });
                      if (!clientId) return;
@@ -154,7 +154,6 @@ self.addEventListener('notificationclick', function (event) {
       clients.matchAll({ type: 'window' }).then((windowClients) => {
          for (var i = 0; i < windowClients.length; i++) {
             var client = windowClients[i];
-            console.log(client.url);
             if (client.url === url && 'focus' in client) {
                return client.focus();
             }

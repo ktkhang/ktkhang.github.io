@@ -176,6 +176,15 @@ $right-bar-width: 300px;
          cursor: progress;
       }
    }
+
+   &--typing {
+      margin: 8px 0px -16px;
+      font-size: 12px;
+      padding: 4px 8px;
+      background-color: lightgrey;
+      width: max-content;
+      min-width: 110px;
+   }
 }
 
 // Small devices (landscape phones, less than 768px)
@@ -191,6 +200,9 @@ $right-bar-width: 300px;
          margin-right: 0;
       }
       &__chatbox {
+         right: 0;
+      }
+      &__error {
          right: 0;
       }
    }

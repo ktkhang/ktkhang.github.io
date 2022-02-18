@@ -1,11 +1,17 @@
 import { useRef, useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
-import { chatLogState, messagesState, socketState } from '../store/atoms';
+import {
+   chatLogState,
+   messagesState,
+   socketState,
+   typingUsersState,
+} from '../store/atoms';
 import { getSavedDeviceId, uuidv4 } from '../utils/common';
 
 const useSocketHandler = () => {
    const setChatLog = useSetRecoilState(chatLogState);
    const setMessages = useSetRecoilState(messagesState);
+   const setTypingUsers = useSetRecoilState(typingUsersState);
    const setSocketState = useSetRecoilState(socketState);
    const deviceId = getSavedDeviceId();
    const timer = useRef();
@@ -48,6 +54,10 @@ const useSocketHandler = () => {
       setMessages((prev) => [...prev, ...payload]);
    };
 
+   const _handleSetTypingUsers = (payload = {}) => {
+      setTypingUsers({ ...payload });
+   };
+
    const _ping = (websocket, retryCallback) => {
       websocket.send(
          JSON.stringify({
@@ -77,6 +87,9 @@ const useSocketHandler = () => {
 
          case 'message':
             return _handleMessage(payload);
+
+         case 'set_typing':
+            return _handleSetTypingUsers(payload);
 
          case '__pong__':
             return _pong();

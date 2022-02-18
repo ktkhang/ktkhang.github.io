@@ -15,6 +15,11 @@ export const messagesState = atom({
    default: [],
 });
 
+export const typingUsersState = atom({
+   key: 'typingUsersState',
+   default: {},
+});
+
 export const pendingMessagesState = atom({
    key: 'pendingMessagesState',
    default: [],
