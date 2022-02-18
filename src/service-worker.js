@@ -73,7 +73,7 @@ self.addEventListener('message', (event) => {
 });
 
 const sendPendingMessages = (deviceId, messages) => {
-   return fetch('https://ktkhang.herokuapp.com/message/send', {
+   return fetch('https://ktkhang.onrender.com/message/send', {
       method: 'POST',
       headers: {
          'Content-Type': 'application/json',
@@ -100,26 +100,20 @@ self.addEventListener('fetch', (event) => {
 
 // Network is back up
 self.addEventListener('sync', (event) => {
-   console.log('sync_pending_messages');
    console.log(event.tag);
    if (event.tag === SYNC_PENDING_MESSAGE_TAG) {
       event.waitUntil(
          (async () => {
-            console.log('start sync');
             const deviceId = await localforage.getItem(DEVICE_ID_VARIABLE);
             const msgs = await localforage.getItem(SYNC_PENDING_MESSAGE_TAG);
-            console.log(deviceId);
-            console.log('msgs', msgs);
             if (deviceId && msgs?.length) {
                const pendingMessages = msgs.map((msg) => msg.content);
                const clientId = await localforage.getItem(CLIENT_ID);
-               console.log(clientId);
-               console.log(pendingMessages);
                const response = await sendPendingMessages(deviceId, pendingMessages);
                if (response.errorCode === 0) {
+                  console.log('resend success');
                   if (!clientId) return;
                   self.clients.get(clientId).then((client) => {
-                     console.log(client);
                      client.postMessage({
                         msg: RESET_PENDING_MESSAGES,
                      });
