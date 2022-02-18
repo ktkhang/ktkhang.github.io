@@ -100,10 +100,10 @@ self.addEventListener('fetch', (event) => {
 
 // Network is back up
 self.addEventListener('sync', (event) => {
+   console.log('sync_pending_messages');
    if (event.tag === SYNC_PENDING_MESSAGE_TAG) {
       event.waitUntil(
          (async () => {
-            console.log('SYNC_PENDING_MESSAGE_TAG');
             const deviceId = await localforage.getItem(DEVICE_ID_VARIABLE);
             const msgs = await localforage.getItem(SYNC_PENDING_MESSAGE_TAG);
             if (deviceId && msgs?.length) {

@@ -2,6 +2,8 @@ import { config } from '../constants/confjg';
 
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 
+const HOST = config.API_URL.replace(/^(https|http)/, 'ws') + '/ws';
+
 let websocket;
 
 const get = () => websocket;
@@ -12,7 +14,7 @@ const close = () => {
 
 const connect = () => {
    if (websocket) return websocket;
-   websocket = new WebSocket(config.SOCKET_URL);
+   websocket = new WebSocket(HOST);
    return websocket;
 };
 
