@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
 import useSocketHandler from '../hooks/useSocketHandler';
 import { socketState } from '../store/atoms';
@@ -11,30 +11,36 @@ import ChatLog from './ChatLog';
 
 const Main = () => {
    const { errorCode } = useRecoilValue(socketState);
-   const [reconnectFlag, setReconnectFlag] = useState(false);
    const { handleOpen, handleClose, handleMessage, handleError } = useSocketHandler();
 
-   useEffect(() => {
-      const connect = () => {
-         const websocket = socket.connect(getSavedDeviceId());
-         websocket.onopen = handleOpen(websocket, connect);
-         websocket.onclose = handleClose(connect);
-         websocket.onmessage = handleMessage;
-         websocket.onerror = handleError;
-      };
-      connect();
+   const isDisconnected = !socket.isOpen();
 
+   const connect = useCallback(() => {
+      const websocket = socket.connect(getSavedDeviceId());
+      websocket.onopen = handleOpen(websocket, connect);
+      websocket.onclose = handleClose(connect);
+      websocket.onmessage = handleMessage;
+      websocket.onerror = handleError;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
+
+   useEffect(() => {
       return () => {
          socket.close();
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [reconnectFlag]);
+   }, []);
+
+   useEffect(() => {
+      if (isDisconnected) {
+         connect();
+      }
+   }, [isDisconnected, connect]);
 
    const reconnect = useCallback(() => {
       if (!socket.isOpen()) {
-         setReconnectFlag((v) => !v);
+         connect();
       }
-   }, []);
+   }, [connect]);
 
    return (
       <div className="main">

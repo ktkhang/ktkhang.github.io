@@ -1,10 +1,8 @@
-import React, { memo, useState, useRef } from 'react';
+import React, { memo, useState } from 'react';
 import { messageService } from '../services/messageService';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { pendingMessagesState, userInfoState } from '../store/atoms';
 import { getSavedDeviceId, uuidv4 } from '../utils/common';
-// import { getSavedDeviceId } from '../utils/common';
-// import socket from '../utils/socket';
 
 const ChatBox = memo(() => {
    const [msg, setMsg] = useState('');
