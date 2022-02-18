@@ -97,6 +97,7 @@ const CLIENT_ID = 'client_id';
 const DEVICE_ID_VARIABLE = 'client_device_id';
 const SYNC_PENDING_MESSAGE_TAG = 'sync_pending_messages';
 const RESET_PENDING_MESSAGES = 'reset_pending_messages';
+const RECONNECT = 'reconnect';
 
 self.addEventListener('fetch', (event) => {
    localforage.setItem(CLIENT_ID, event.clientId);
@@ -105,26 +106,35 @@ self.addEventListener('fetch', (event) => {
 // Network is back up
 self.addEventListener('sync', (event) => {
    console.log(event.tag);
-   if (event.tag === SYNC_PENDING_MESSAGE_TAG) {
-      event.waitUntil(
-         (async () => {
-            const deviceId = await localforage.getItem(DEVICE_ID_VARIABLE);
-            const msgs = await localforage.getItem(SYNC_PENDING_MESSAGE_TAG);
-            if (deviceId && msgs?.length) {
-               const pendingMessages = msgs.map((msg) => msg.content);
-               const clientId = await localforage.getItem(CLIENT_ID);
-               const response = await sendPendingMessages(deviceId, pendingMessages);
-               if (response && response.errorCode === 0) {
-                  console.log('resend success');
-                  if (!clientId) return;
-                  self.clients.get(clientId).then((client) => {
-                     client.postMessage({
-                        msg: RESET_PENDING_MESSAGES,
+   // send client reconnect websocket server
+   event.waitUntil(
+      (async () => {
+         const clientId = await localforage.getItem(CLIENT_ID);
+         self.clients.get(clientId).then((client) => {
+            client.postMessage({
+               msg: RECONNECT,
+            });
+         });
+         // sync pending messages
+         if (event.tag === SYNC_PENDING_MESSAGE_TAG) {
+            setTimeout(async () => {
+               const deviceId = await localforage.getItem(DEVICE_ID_VARIABLE);
+               const msgs = await localforage.getItem(SYNC_PENDING_MESSAGE_TAG);
+               if (deviceId && msgs?.length) {
+                  const pendingMessages = msgs.map((msg) => msg.content);
+                  const response = await sendPendingMessages(deviceId, pendingMessages);
+                  if (response && response.errorCode === 0) {
+                     console.log('resend success');
+                     if (!clientId) return;
+                     self.clients.get(clientId).then((client) => {
+                        client.postMessage({
+                           msg: RESET_PENDING_MESSAGES,
+                        });
                      });
-                  });
+                  }
                }
-            }
-         })()
-      );
-   }
+            }, 500);
+         }
+      })()
+   );
 });

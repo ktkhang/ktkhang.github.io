@@ -29,11 +29,16 @@ const emit = (event, payload) => {
    );
 };
 
+const isOpen = () => {
+   return websocket && websocket.readyState === websocket.OPEN;
+};
+
 const socket = {
    get,
    connect,
    close,
    emit,
+   isOpen,
 };
 
 export default socket;

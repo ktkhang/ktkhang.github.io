@@ -10,11 +10,13 @@ const useSocketHandler = () => {
    const deviceId = getSavedDeviceId();
    const timer = useRef();
    const pingInterval = useRef();
+   const retryTimer = useRef();
 
    useEffect(() => {
       return () => {
          clearTimeout(timer.current);
          clearInterval(pingInterval.current);
+         clearInterval(retryTimer.current);
       };
    }, []);
 
@@ -49,7 +51,6 @@ const useSocketHandler = () => {
    };
 
    const _ping = (websocket, retryCallback) => {
-      console.log('_ping');
       websocket.send(
          JSON.stringify({
             type: '__ping__',
@@ -61,7 +62,6 @@ const useSocketHandler = () => {
    };
 
    const _pong = () => {
-      console.log('_pong');
       clearTimeout(timer.current);
    };
 
@@ -90,6 +90,7 @@ const useSocketHandler = () => {
 
    // handle connection open
    const handleOpen = (websocket, retryCallback) => (e) => {
+      clearInterval(retryTimer.current);
       websocket.send(
          JSON.stringify({
             type: 'joined',
@@ -105,8 +106,13 @@ const useSocketHandler = () => {
    };
 
    // handle connection close
-   const handleClose = (e) => {
+   const handleClose = (retryCallback) => (e) => {
       setSocketState((prev) => ({ ...prev, errorCode: e.code !== 1005 ? e.code : 0 }));
+      if (retryCallback) {
+         retryTimer.current = setInterval(() => {
+            retryCallback();
+         }, 1000);
+      }
    };
 
    // handle error

@@ -5,12 +5,14 @@ import {
    LAST_SYNC_MESSAGE_ID,
    LOCAL_MESSAGES,
    SYNC_PENDING_MESSAGE_TAG,
+   RESET_PENDING_MESSAGES,
+   RECONNECT,
 } from '../constants/variables';
 import useHasChanged from '../hooks/useHasChanged';
 import { messageService } from '../services/messageService';
 import { messagesState, pendingMessagesState } from '../store/atoms';
 
-const BackgroundSync = memo(() => {
+const BackgroundSync = memo(({ reconnect }) => {
    const [messages, setMessages] = useRecoilState(messagesState);
    const [pendingMessages, setPendingMessages] = useRecoilState(pendingMessagesState);
    const lastMessageId = messages[messages.length - 1]?.id || '';
@@ -51,8 +53,12 @@ const BackgroundSync = memo(() => {
 
    useEffect(() => {
       const handleSwPostMessage = (e) => {
-         if (e.data.msg === 'reset_pending_messages') {
+         if (e.data.msg === RESET_PENDING_MESSAGES) {
             setPendingMessages([]);
+         }
+         if (e.data.msg === RECONNECT) {
+            console.log('reconnect');
+            reconnect && reconnect();
          }
       };
       const init = async () => {

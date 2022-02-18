@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
 import useSocketHandler from '../hooks/useSocketHandler';
 import { socketState } from '../store/atoms';
@@ -15,19 +15,26 @@ const Main = () => {
    const { handleOpen, handleClose, handleMessage, handleError } = useSocketHandler();
 
    useEffect(() => {
-      const websocket = socket.connect(getSavedDeviceId());
-      websocket.onopen = handleOpen(websocket, () => {
-         setReconnectFlag((v) => !v);
-      });
-      websocket.onclose = handleClose;
-      websocket.onmessage = handleMessage;
-      websocket.onerror = handleError;
+      const connect = () => {
+         const websocket = socket.connect(getSavedDeviceId());
+         websocket.onopen = handleOpen(websocket, connect);
+         websocket.onclose = handleClose(connect);
+         websocket.onmessage = handleMessage;
+         websocket.onerror = handleError;
+      };
+      connect();
 
       return () => {
          socket.close();
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [reconnectFlag]);
+
+   const reconnect = useCallback(() => {
+      if (!socket.isOpen()) {
+         setReconnectFlag((v) => !v);
+      }
+   }, []);
 
    return (
       <div className="main">
@@ -44,7 +51,7 @@ const Main = () => {
             <ChatBox />
          </div>
          <ChatLog />
-         <BackgroundSync />
+         <BackgroundSync reconnect={reconnect} />
       </div>
    );
 };
