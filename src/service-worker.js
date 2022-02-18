@@ -86,6 +86,10 @@ const sendPendingMessages = (deviceId, messages) => {
       .then((response) => response.json())
       .catch((error) => {
          console.log(error);
+         if (!self.registration.sync) {
+            return;
+         }
+         self.registration.sync.register(SYNC_PENDING_MESSAGE_TAG);
       });
 };
 
@@ -110,7 +114,7 @@ self.addEventListener('sync', (event) => {
                const pendingMessages = msgs.map((msg) => msg.content);
                const clientId = await localforage.getItem(CLIENT_ID);
                const response = await sendPendingMessages(deviceId, pendingMessages);
-               if (response.errorCode === 0) {
+               if (response && response.errorCode === 0) {
                   console.log('resend success');
                   if (!clientId) return;
                   self.clients.get(clientId).then((client) => {
