@@ -10,6 +10,7 @@ const get = () => websocket;
 
 const close = () => {
    websocket && websocket.close();
+   websocket = null;
 };
 
 const connect = () => {

@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useRef } from 'react';
 import { messageService } from '../services/messageService';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { pendingMessagesState, userInfoState } from '../store/atoms';
@@ -18,7 +18,6 @@ const ChatBox = memo(() => {
       //    deviceId: getSavedDeviceId(),
       //    msg: msg.trim(),
       // });
-
       const response = await messageService.send(msg.trim());
 
       if (response.errorCode !== 0) {
@@ -45,7 +44,7 @@ const ChatBox = memo(() => {
             value={msg}
             placeholder="Type a message..."
             onChange={(e) => setMsg(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
          />
          <button onClick={sendMessage}>Send</button>
       </div>
