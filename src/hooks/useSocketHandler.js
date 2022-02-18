@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { chatLogState, messagesState, socketState } from '../store/atoms';
 import { getSavedDeviceId, uuidv4 } from '../utils/common';
@@ -7,6 +8,15 @@ const useSocketHandler = () => {
    const setMessages = useSetRecoilState(messagesState);
    const setSocketState = useSetRecoilState(socketState);
    const deviceId = getSavedDeviceId();
+   const timer = useRef();
+   const pingInterval = useRef();
+
+   useEffect(() => {
+      return () => {
+         clearTimeout(timer.current);
+         clearInterval(pingInterval.current);
+      };
+   }, []);
 
    const _handleUserJoined = (payload) => {
       const { user, time } = payload;
@@ -38,6 +48,23 @@ const useSocketHandler = () => {
       setMessages((prev) => [...prev, ...payload]);
    };
 
+   const _ping = (websocket, retryCallback) => {
+      console.log('_ping');
+      websocket.send(
+         JSON.stringify({
+            type: '__ping__',
+         })
+      );
+      timer.current = setTimeout(function () {
+         retryCallback && retryCallback();
+      }, 5000);
+   };
+
+   const _pong = () => {
+      console.log('_pong');
+      clearTimeout(timer.current);
+   };
+
    // handle message
    const handleMessage = (msg) => {
       console.log(JSON.parse(msg.data));
@@ -53,13 +80,16 @@ const useSocketHandler = () => {
          case 'message':
             return _handleMessage(payload);
 
+         case '__pong__':
+            return _pong();
+
          default:
             break;
       }
    };
 
    // handle connection open
-   const handleOpen = (websocket) => (e) => {
+   const handleOpen = (websocket, retryCallback) => (e) => {
       websocket.send(
          JSON.stringify({
             type: 'joined',
@@ -69,11 +99,13 @@ const useSocketHandler = () => {
          })
       );
       setSocketState((prev) => ({ ...prev, errorCode: 0 }));
+
+      // ping ws keep alive
+      pingInterval.current = setInterval(() => _ping(websocket, retryCallback), 30000);
    };
 
    // handle connection close
    const handleClose = (e) => {
-      console.log(e);
       setSocketState((prev) => ({ ...prev, errorCode: e.code !== 1005 ? e.code : 0 }));
    };
 

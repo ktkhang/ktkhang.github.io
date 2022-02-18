@@ -14,7 +14,7 @@ const close = () => {
 };
 
 const connect = () => {
-   if (websocket) return websocket;
+   close();
    websocket = new WebSocket(HOST);
    return websocket;
 };
