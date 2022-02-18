@@ -5,7 +5,9 @@ import { getDeviceId } from './utils/common';
 import { useRecoilState } from 'recoil';
 import { userInfoState } from './store/atoms';
 import Main from './components/Main';
+import localforage from 'localforage';
 import './scss/styles.scss';
+import { DEVICE_ID_VARIABLE } from './constants/variables';
 
 const App = () => {
    const [userInfo, setUserInfo] = useRecoilState(userInfoState);
@@ -15,6 +17,9 @@ const App = () => {
       const init = async () => {
          const deviceId = await getDeviceId();
          const response = await userService.getMe(deviceId);
+         try {
+            await localforage.setItem(DEVICE_ID_VARIABLE, deviceId);
+         } catch {}
          if (response.errorCode === 0) {
             setUserInfo(response.data);
          }

@@ -1,6 +1,5 @@
 import { DEVICE_ID_VARIABLE } from '../constants/variables';
 import moment from 'moment-timezone';
-import localforage from 'localforage';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 export const getDeviceId = async () => {
@@ -10,9 +9,6 @@ export const getDeviceId = async () => {
    const fp = await _fpPromise;
    const result = await fp.get();
    localStorage[DEVICE_ID_VARIABLE] = result.visitorId;
-   try {
-      await localforage.setItem(DEVICE_ID_VARIABLE, result.visitorId);
-   } catch {}
    return result.visitorId;
 };
 
