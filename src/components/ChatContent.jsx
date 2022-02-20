@@ -79,7 +79,7 @@ const MessageItem = memo((props) => {
                         if (displayStatus === MessageStatus.SENDING) {
                            return <span className="message-item__sending">Sending</span>;
                         }
-                        if (status === MessageStatus.SENT) {
+                        if (displayStatus === MessageStatus.SENT) {
                            return <span className="message-item__sent">Sent</span>;
                         }
                      })()}
