@@ -162,14 +162,26 @@ $right-bar-width: 300px;
          }
       }
       &__time {
-         font-size: 12px;
          color: #8e8e8e;
-         margin-top: 6px;
       }
-      &__pending {
+      &__subinfo {
+         display: flex;
+         align-items: center;
+         gap: 12px;
+         margin-top: 6px;
+         font-size: 12px;
+      }
+      &__sending {
          font-size: 12px;
          color: #f18140;
-         margin-top: 6px;
+         display: flex;
+         align-items: center;
+         gap: 4px;
+         cursor: progress;
+      }
+      &__sent {
+         font-size: 12px;
+         color: #8e8e8e;
          display: flex;
          align-items: center;
          gap: 4px;

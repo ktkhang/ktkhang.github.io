@@ -62,7 +62,7 @@ class WebSocketProvider extends PureComponent {
    reconnect = () => {
       this.setState(
          (prevState) => ({
-            ws: window.WebSocket(this.props.url, this.props.protocol),
+            ws: new window.WebSocket(this.props.url, this.props.protocol),
             attempts: prevState.attempts + 1,
          }),
          this.setupWebsocket

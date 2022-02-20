@@ -6,7 +6,7 @@ import {
    socketState,
    typingUsersState,
 } from '../store/atoms';
-import { getSavedDeviceId, uuidv4 } from '../utils/common';
+import { checkPushNotiSupported, getSavedDeviceId, uuidv4 } from '../utils/common';
 
 const useSocketHandler = () => {
    const setChatLog = useSetRecoilState(chatLogState);

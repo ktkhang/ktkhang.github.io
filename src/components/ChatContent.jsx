@@ -1,7 +1,6 @@
-import React, { memo, useEffect, useRef } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import MessageStatus from '../enums/MessageStatus';
-import IconClock from '../icons/IconClock';
 import IconUser from '../icons/IconUser';
 import { messagesState } from '../store/atoms';
 import { displayTime, getSavedDeviceId } from '../utils/common';
@@ -40,6 +39,30 @@ const ChatContent = memo(() => {
 
 const MessageItem = memo((props) => {
    const { sender, sendAt, content, isMe, prevIsMe, status } = props;
+   const [displayStatus, setDisplayStatus] = useState(MessageStatus.SENT);
+   const statusRef = useRef(status);
+   const delayTimer = useRef(null);
+
+   useEffect(() => {
+      statusRef.current = status;
+   });
+
+   useEffect(() => {
+      if (status !== MessageStatus.SENDING) {
+         setDisplayStatus(status);
+      } else {
+         delayTimer.current = setTimeout(() => {
+            if (statusRef.current !== MessageStatus.SENT) {
+               setDisplayStatus(status);
+            }
+         }, 1000);
+      }
+
+      return () => {
+         clearTimeout(delayTimer.current);
+      };
+   }, [status]);
+
    return (
       <div className={`message-item-container ${isMe ? 'me' : ''}`}>
          <div className="message-item">
@@ -49,20 +72,18 @@ const MessageItem = memo((props) => {
             <div className="message-item__info">
                {!prevIsMe && <label>{sender.name}</label>}
                <p>{content}</p>
-               {(() => {
-                  if (status === MessageStatus.SENDING) {
-                     return (
-                        <span className="message-item__pending">
-                           <IconClock />
-                           Sending...
-                        </span>
-                     );
-                  }
-
-                  return (
-                     <span className="message-item__time">{displayTime(sendAt)}</span>
-                  );
-               })()}
+               <div className="message-item__subinfo">
+                  <span className="message-item__time">{displayTime(sendAt)}</span>
+                  {isMe &&
+                     (() => {
+                        if (displayStatus === MessageStatus.SENDING) {
+                           return <span className="message-item__sending">Sending</span>;
+                        }
+                        if (status === MessageStatus.SENT) {
+                           return <span className="message-item__sent">Sent</span>;
+                        }
+                     })()}
+               </div>
             </div>
          </div>
       </div>

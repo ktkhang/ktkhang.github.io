@@ -37,3 +37,13 @@ export const displayDateTime = (isoString) => {
 export const displayTime = (isoString) => {
    return moment(isoString).tz(getTimeZone()).format('hh:mm A');
 };
+
+export const checkPushNotiSupported = () => {
+   if (!('serviceWorker' in navigator)) return false;
+   if (!('showNotification' in ServiceWorkerRegistration.prototype)) return false;
+   // Check the current Notification permission.
+   if (Notification.permission === 'denied') return false;
+   // Check if push messaging is supported
+   if (!('PushManager' in window)) return false;
+   return true;
+};

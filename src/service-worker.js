@@ -72,10 +72,6 @@ self.addEventListener('message', (event) => {
    }
 });
 
-/**
- *
- */
-
 self.addEventListener('install', function (e) {
    e.waitUntil(self.skipWaiting());
 });
@@ -132,19 +128,14 @@ self.addEventListener('sync', (event) => {
          );
          if (pendingMessages?.length) {
             const clients = await getClients();
-            await Promise.all(
-               clients.map((client) => {
-                  return client.postMessage({
-                     type: CONTINUE_SEND_MESSAGES,
-                     payload: {
-                        messages: pendingMessages,
-                     },
-                  });
-               })
-            );
-            // const response = await sendPendingMessages(deviceId, pendingMessages);
-            // if (response && response.errorCode === 0) {
-            //    console.log('resend success');
+            clients.forEach((client) => {
+               client.postMessage({
+                  type: CONTINUE_SEND_MESSAGES,
+                  payload: {
+                     messages: pendingMessages,
+                  },
+               });
+            });
             self.registration.showNotification(`Messages synced`, {
                icon: '/logo192.png',
                body: 'Your messages have been synced.',
@@ -152,6 +143,9 @@ self.addEventListener('sync', (event) => {
                   url: 'https://ktkhang.github.io/',
                },
             });
+            // const response = await sendPendingMessages(deviceId, pendingMessages);
+            // if (response && response.errorCode === 0) {
+            //    console.log('resend success');
 
             //    // if (!clientId) return;
             //    // self.clients.get(clientId).then((client) => {
