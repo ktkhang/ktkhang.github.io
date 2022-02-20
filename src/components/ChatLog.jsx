@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { chatLogState } from '../store/atoms';
-import { displayTime } from '../utils/common';
+import { displayDateTime } from '../utils/common';
 
 const ChatLog = memo(() => {
    const chatLog = useRecoilValue(chatLogState);
@@ -14,7 +14,7 @@ const ChatLog = memo(() => {
          <div className="main__log--container">
             {chatLog.map((log) => (
                <div className="main__log--item" key={log.id}>
-                  <div className="time">{displayTime(log.time)}: </div>
+                  <div className="time">{displayDateTime(log.time)}: </div>
                   <div>{log.msg}</div>
                </div>
             ))}

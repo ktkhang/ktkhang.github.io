@@ -64,7 +64,7 @@ registerRoute(
    })
 );
 
-// This allows the web app to trigger skipWaiting via
+// Allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
 self.addEventListener('message', (event) => {
    if (event.data && event.data.type === 'SKIP_WAITING') {
@@ -72,36 +72,51 @@ self.addEventListener('message', (event) => {
    }
 });
 
-const sendPendingMessages = (deviceId, messages) => {
-   return fetch('https://ktkhang.onrender.com/message/send', {
-      method: 'POST',
-      headers: {
-         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-         deviceId,
-         messages,
-      }),
-   })
-      .then((response) => response.json())
-      .catch((error) => {
-         console.log(error);
-         if (!self.registration.sync) {
-            return;
-         }
-         self.registration.sync.register(SYNC_PENDING_MESSAGE_TAG);
-      });
-};
+/**
+ *
+ */
 
-const CLIENT_ID = 'client_id';
-const DEVICE_ID_VARIABLE = 'client_device_id';
-const SYNC_PENDING_MESSAGE_TAG = 'sync_pending_messages';
-const RESET_PENDING_MESSAGES = 'reset_pending_messages';
-const RECONNECT = 'reconnect';
-
-self.addEventListener('fetch', (event) => {
-   localforage.setItem(CLIENT_ID, event.clientId);
+self.addEventListener('install', function (e) {
+   e.waitUntil(self.skipWaiting());
 });
+
+self.addEventListener('activate', function (event) {
+   console.log('[SW] on activate');
+   event.waitUntil(self.clients.claim());
+});
+
+// const sendPendingMessages = (deviceId, messages) => {
+//    return fetch('https://ktkhang.onrender.com/message/send', {
+//       method: 'POST',
+//       headers: {
+//          'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//          deviceId,
+//          messages,
+//       }),
+//    })
+//       .then((response) => response.json())
+//       .catch((error) => {
+//          console.log(error);
+//       });
+// };
+
+// const CLIENT_ID = 'client_id';
+const LOCAL_MESSAGES = 'local_messages';
+const CONTINUE_SEND_MESSAGES = 'continue_send_messages';
+
+// self.addEventListener('fetch', (event) => {
+//    // localforage.setItem(CLIENT_ID, event.clientId);
+// });
+
+async function getClients() {
+   const appUrl = new URL(self.registration.scope).origin;
+   const clients = await self.clients.matchAll({ type: 'window' });
+   return clients.filter((client) => {
+      return new URL(client.url).origin === appUrl;
+   });
+}
 
 // Network is back up
 self.addEventListener('sync', (event) => {
@@ -109,58 +124,44 @@ self.addEventListener('sync', (event) => {
    // send client reconnect websocket server
    event.waitUntil(
       (async () => {
-         const clientId = await localforage.getItem(CLIENT_ID);
-         self.clients.get(clientId).then((client) => {
-            client.postMessage({
-               msg: RECONNECT,
-            });
-         });
          // sync pending messages
-         if (event.tag === SYNC_PENDING_MESSAGE_TAG) {
-            setTimeout(async () => {
-               const deviceId = await localforage.getItem(DEVICE_ID_VARIABLE);
-               const msgs = await localforage.getItem(SYNC_PENDING_MESSAGE_TAG);
-               if (deviceId && msgs?.length) {
-                  const pendingMessages = msgs.map((msg) => msg.content);
-                  const response = await sendPendingMessages(deviceId, pendingMessages);
-                  if (response && response.errorCode === 0) {
-                     console.log('resend success');
-                     // Let the user know, if they granted permissions before.
-                     self.registration.showNotification(`Messages synced`, {
-                        icon: '/logo192.png',
-                        body: 'Your messages have been synced.',
-                        data: {
-                           url: 'https://ktkhang.github.io/',
-                        },
-                     });
-                     if (!clientId) return;
-                     self.clients.get(clientId).then((client) => {
-                        client.postMessage({
-                           msg: RESET_PENDING_MESSAGES,
-                        });
-                     });
-                  }
-               }
-            }, 500);
-         }
-      })()
-   );
-});
+         // if (event.tag === SYNC_PENDING_MESSAGE_TAG) {
+         const messages = await localforage.getItem(LOCAL_MESSAGES);
+         const pendingMessages = messages.filter(
+            (message) => message.status === 'sending'
+         );
+         if (pendingMessages?.length) {
+            const clients = await getClients();
+            await Promise.all(
+               clients.map((client) => {
+                  return client.postMessage({
+                     type: CONTINUE_SEND_MESSAGES,
+                     payload: {
+                        messages: pendingMessages,
+                     },
+                  });
+               })
+            );
+            // const response = await sendPendingMessages(deviceId, pendingMessages);
+            // if (response && response.errorCode === 0) {
+            //    console.log('resend success');
+            self.registration.showNotification(`Messages synced`, {
+               icon: '/logo192.png',
+               body: 'Your messages have been synced.',
+               data: {
+                  url: 'https://ktkhang.github.io/',
+               },
+            });
 
-self.addEventListener('notificationclick', function (event) {
-   let url = event.notification.data.url;
-   event.notification.close();
-   event.waitUntil(
-      clients.matchAll({ type: 'window' }).then((windowClients) => {
-         for (var i = 0; i < windowClients.length; i++) {
-            var client = windowClients[i];
-            if (client.url === url && 'focus' in client) {
-               return client.focus();
-            }
+            //    // if (!clientId) return;
+            //    // self.clients.get(clientId).then((client) => {
+            //    //    client.postMessage({
+            //    //       msg: RESET_PENDING_MESSAGES,
+            //    //    });
+            //    // });
+            // }
          }
-         if (clients.openWindow) {
-            return clients.openWindow(url);
-         }
-      })
+         // }
+      })()
    );
 });

@@ -20,11 +20,6 @@ export const typingUsersState = atom({
    default: {},
 });
 
-export const pendingMessagesState = atom({
-   key: 'pendingMessagesState',
-   default: [],
-});
-
 export const socketState = atom({
    key: 'socketState',
    default: {

@@ -30,6 +30,10 @@ export const getTimeZone = () => {
    return moment.tz.guess();
 };
 
-export const displayTime = (isoString) => {
+export const displayDateTime = (isoString) => {
    return moment(isoString).tz(getTimeZone()).format('MMM DD, YYYY hh:mm A');
+};
+
+export const displayTime = (isoString) => {
+   return moment(isoString).tz(getTimeZone()).format('hh:mm A');
 };

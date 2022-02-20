@@ -1,52 +1,55 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
-import { messageService } from '../services/messageService';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
-import { pendingMessagesState, userInfoState } from '../store/atoms';
+import { messagesState, userInfoState } from '../store/atoms';
 import { getSavedDeviceId, uuidv4 } from '../utils/common';
 import useDebounce from '../hooks/useDebounce';
-import socket from '../utils/socket';
+import useWebSocket from '../lib/websocket/useWebSocket';
+import MessageStatus from '../enums/MessageStatus';
 
 const ChatBox = memo(() => {
+   const deviceId = getSavedDeviceId();
+
    const [msg, setMsg] = useState('');
-   const setPendingMessages = useSetRecoilState(pendingMessagesState);
+   // const [submiting, setSubmiting] = useState(false);
+   const { send } = useWebSocket();
+   const setMessages = useSetRecoilState(messagesState);
    const userInfo = useRecoilValue(userInfoState);
+
    const isTyping = useDebounce(msg.trim() !== '', 500);
    const selfChanged = useRef(false);
 
    useEffect(() => {
       if (selfChanged.current) {
-         socket.emit('set_typing', {
-            deviceId: getSavedDeviceId(),
+         send('set_typing', {
+            deviceId,
             isTyping,
          });
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [isTyping]);
 
    const sendMessage = async () => {
       if (!msg.trim()) return;
+      // await setSubmiting(true);
       setMsg('');
-      // socket.emit('message', {
-      //    deviceId: getSavedDeviceId(),
-      //    msg: msg.trim(),
-      // });
-      const response = await messageService.send(msg.trim());
+      const newMessage = {
+         id: uuidv4(),
+         deviceId,
+         content: msg.trim(),
+         sender: {
+            ...(userInfo || {}),
+            deviceId,
+         },
+         sendAt: new Date(),
+         status: MessageStatus.SENDING,
+      };
+      await setMessages((prevMessages) => [...prevMessages, newMessage]);
+      send('message', {
+         deviceId,
+         messages: [newMessage],
+      });
 
-      if (response.errorCode !== 0) {
-         // internet disconnected
-         if (response.errorCode === 'ERR_INTERNET_DISCONNECTED') {
-            const deviceId = getSavedDeviceId();
-            setPendingMessages((prevData) => [
-               ...prevData,
-               {
-                  id: uuidv4(),
-                  deviceId,
-                  content: msg.trim(),
-                  sendAt: new Date(),
-                  sender: { ...(userInfo || {}) },
-               },
-            ]);
-         }
-      }
+      // setSubmiting(false);
    };
 
    const handleChange = (e) => {
@@ -59,7 +62,7 @@ const ChatBox = memo(() => {
             value={msg}
             placeholder="Type a message..."
             onChange={handleChange}
-            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            onKeyUp={(e) => (e.key === 'Enter' || e.keyCode === 13) && sendMessage()}
          />
          <button onClick={sendMessage}>Send</button>
       </div>

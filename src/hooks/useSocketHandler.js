@@ -1,5 +1,5 @@
-import { useRef, useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
+import MessageStatus from '../enums/MessageStatus';
 import {
    chatLogState,
    messagesState,
@@ -14,15 +14,6 @@ const useSocketHandler = () => {
    const setTypingUsers = useSetRecoilState(typingUsersState);
    const setSocketState = useSetRecoilState(socketState);
    const deviceId = getSavedDeviceId();
-   const timer = useRef();
-   const pingInterval = useRef();
-
-   useEffect(() => {
-      return () => {
-         clearTimeout(timer.current);
-         clearInterval(pingInterval.current);
-      };
-   }, []);
 
    const _handleUserJoined = (payload) => {
       const { user, time } = payload;
@@ -50,33 +41,44 @@ const useSocketHandler = () => {
       ]);
    };
 
-   const _handleMessage = (payload) => {
-      setMessages((prev) => [...prev, ...payload]);
+   const _handleMessage = (msgList) => {
+      setMessages((prevMessages) => {
+         let deliveredMessages = prevMessages.filter(
+            (msg) =>
+               msg.status === MessageStatus.SENDING &&
+               msgList.some((m) => m.resolvedId === msg.id)
+         );
+         const retainedMessages = prevMessages.filter(
+            (msg) => !deliveredMessages.some((m) => m.id === msg.id)
+         );
+         let newMessages = msgList.filter(
+            (msg) =>
+               !deliveredMessages.some((m) => m.id === msg.resolvedId) &&
+               !retainedMessages.some((m) => m.id === msg.id)
+         );
+         if (deliveredMessages.length) {
+            deliveredMessages = deliveredMessages.map((msg) => ({
+               ...msg,
+               status: MessageStatus.SENT,
+            }));
+         }
+         if (newMessages.length) {
+            newMessages = newMessages.map((msg) => ({
+               ...msg,
+               status: MessageStatus.SENT,
+            }));
+         }
+         return [...retainedMessages, ...deliveredMessages, ...newMessages];
+      });
    };
 
    const _handleSetTypingUsers = (payload = {}) => {
       setTypingUsers({ ...payload });
    };
 
-   const _ping = (websocket, retryCallback) => {
-      websocket.send(
-         JSON.stringify({
-            type: '__ping__',
-         })
-      );
-      timer.current = setTimeout(function () {
-         retryCallback && retryCallback();
-      }, 5000);
-   };
-
-   const _pong = () => {
-      clearTimeout(timer.current);
-   };
-
    // handle message
-   const handleMessage = (msg) => {
-      console.log(JSON.parse(msg.data));
-      const { type, payload } = JSON.parse(msg.data);
+   const handleMessage = (data) => {
+      const { type, payload } = data;
 
       switch (type) {
          case 'joined':
@@ -91,17 +93,14 @@ const useSocketHandler = () => {
          case 'set_typing':
             return _handleSetTypingUsers(payload);
 
-         case '__pong__':
-            return _pong();
-
          default:
-            break;
+            return;
       }
    };
 
    // handle connection open
-   const handleOpen = (websocket, retryCallback) => (e) => {
-      websocket.send(
+   const handleOpen = (ws) => {
+      ws.send(
          JSON.stringify({
             type: 'joined',
             payload: {
@@ -110,12 +109,9 @@ const useSocketHandler = () => {
          })
       );
       setSocketState((prev) => ({ ...prev, errorCode: 0 }));
-
-      // ping ws keep alive
-      pingInterval.current = setInterval(() => _ping(websocket, retryCallback), 30000);
    };
 
-   // handle connection close
+   // handle close
    const handleClose = (retryCallback) => (e) => {
       setSocketState((prev) => ({ ...prev, errorCode: e.code !== 1005 ? e.code : 0 }));
    };

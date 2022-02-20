@@ -14,7 +14,7 @@ const close = () => {
 };
 
 const connect = () => {
-   close();
+   // close();
    websocket = new WebSocket(HOST);
    return websocket;
 };
@@ -40,5 +40,10 @@ const socket = {
    emit,
    isOpen,
 };
+
+class Socket {
+   ws;
+   constructor() {}
+}
 
 export default socket;
