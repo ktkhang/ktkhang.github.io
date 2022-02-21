@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import { RecoilRoot } from 'recoil';
 import reportWebVitals from './reportWebVitals';
-// import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import pushNotifications from './pushNotifications';
 
 ReactDOM.render(
    <React.StrictMode>
@@ -15,23 +15,13 @@ ReactDOM.render(
    document.getElementById('root')
 );
 
-// serviceWorkerRegistration.register();
-
-if ('serviceWorker' in navigator) {
-   navigator.serviceWorker
-      .register('./service-worker.js')
-      .then((reg) => {
-         if (reg.installing) {
-            console.log('Service worker installing');
-         } else if (reg.waiting) {
-            console.log('Service worker installed');
-         } else if (reg.active) {
-            console.log('Service worker active');
-         }
-      })
-      .catch((e) => {
-         console.log('Registration failed with ' + e);
-      });
+if (pushNotifications.isSupported()) {
+   pushNotifications.registerServiceWorker();
+   pushNotifications.requestPermission().then((permission) => {
+      if (permission === 'granted') {
+         pushNotifications.send();
+      }
+   });
 }
 
 // If you want to start measuring performance in your app, pass a function

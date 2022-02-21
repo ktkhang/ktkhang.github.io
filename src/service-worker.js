@@ -116,7 +116,7 @@ async function getClients() {
 
 // Network is back up
 self.addEventListener('sync', (event) => {
-   console.log(event.tag);
+   console.log('[SW] sync');
    // send client reconnect websocket server
    event.waitUntil(
       (async () => {
@@ -127,6 +127,13 @@ self.addEventListener('sync', (event) => {
             (message) => message.status === 'sending'
          );
          if (pendingMessages?.length) {
+            self.registration.showNotification(`Messages synced`, {
+               icon: '/logo192.png',
+               body: 'Your messages have been synced.',
+               data: {
+                  url: 'https://ktkhang.github.io/',
+               },
+            });
             const clients = await getClients();
             clients.forEach((client) => {
                client.postMessage({
@@ -135,13 +142,6 @@ self.addEventListener('sync', (event) => {
                      messages: pendingMessages,
                   },
                });
-            });
-            self.registration.showNotification(`Messages synced`, {
-               icon: '/logo192.png',
-               body: 'Your messages have been synced.',
-               data: {
-                  url: 'https://ktkhang.github.io/',
-               },
             });
             // const response = await sendPendingMessages(deviceId, pendingMessages);
             // if (response && response.errorCode === 0) {
