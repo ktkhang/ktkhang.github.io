@@ -176,7 +176,6 @@ self.addEventListener('push', (e) => {
 self.addEventListener('notificationclick', (e) => {
    const notification = e.notification;
 
-   if (!notification.data.hasOwnProperty('options')) return;
    e.waitUntil(
       (async () => {
          const client = await firstWindowClient();
@@ -186,6 +185,7 @@ self.addEventListener('notificationclick', (e) => {
             const options = notification.data.options;
             self.clients.openWindow(options.url);
          }
+         e.notification.close();
       })()
    );
 });
