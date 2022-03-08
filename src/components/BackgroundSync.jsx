@@ -50,7 +50,7 @@ class BackgroundSyncHandler extends PureComponent {
          localforage.setItem(LOCAL_MESSAGES, encryptedMessages).then(() => {
             localforage.setItem(LAST_SYNC_MESSAGE_ID, lastMessageId);
          });
-      }, 3000);
+      }, 500);
    };
 
    init = async () => {
