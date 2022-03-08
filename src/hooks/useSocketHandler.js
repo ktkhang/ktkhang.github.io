@@ -54,6 +54,7 @@ const useSocketHandler = () => {
             deliveredMessages = deliveredMessages.map((msg) => ({
                ...msg,
                status: MessageStatus.SENT,
+               id: msgList.find((m) => m.resolvedId === msg.id).id,
             }));
          }
          if (newMessages.length) {
