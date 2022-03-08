@@ -4,6 +4,7 @@ import { config } from '../constants/confjg';
 import useSocketHandler from '../hooks/useSocketHandler';
 import withSignalProtocolManager from '../lib/e2ee/SignalProtocolManager';
 import WebSocketProvider from '../lib/websocket/WebSocketProvider';
+import pushNotifications from '../pushNotifications';
 import { socketState } from '../store/atoms';
 import BackgroundSync from './BackgroundSync';
 import ChatBox from './ChatBox';
@@ -27,6 +28,7 @@ const Main = () => {
          <div className="main">
             <div className="main__header">
                <h2>Global Chat</h2>
+               <button onClick={() => pushNotifications.broadcast()}>broadcast</button>
             </div>
             <div className="main__body">
                {errorCode !== 0 && <div className="main__error">Waiting for network...</div>}

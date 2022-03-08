@@ -18,8 +18,10 @@ ReactDOM.render(
 if (pushNotifications.isSupported()) {
    pushNotifications.registerServiceWorker();
    pushNotifications.requestPermission().then((permission) => {
+      console.log(permission);
       if (permission === 'granted') {
          // pushNotifications.send();
+         pushNotifications.subscribe();
       }
    });
 }
