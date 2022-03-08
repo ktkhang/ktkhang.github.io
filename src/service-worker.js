@@ -158,11 +158,30 @@ self.addEventListener('sync', (event) => {
    );
 });
 
+const firstWindowClient = async () => {
+   const clients = await getClients();
+   return clients.length ? clients[0] : null;
+};
+
 // web push notification
 self.addEventListener('push', (e) => {
    const data = e.data.json();
    self.registration.showNotification(data.title, {
       body: data.body,
-      icon: data.icon,
+      icon: '/18.png',
+      badge: '/14.png',
    });
+});
+
+self.addEventListener('notificationclick', (e) => {
+   e.waitUntil(
+      (async () => {
+         const client = await firstWindowClient();
+         if (client) {
+            client.focus();
+         } else {
+            self.clients.openWindow(options.url);
+         }
+      })()
+   );
 });

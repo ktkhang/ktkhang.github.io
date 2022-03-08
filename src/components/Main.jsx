@@ -35,7 +35,6 @@ const Main = () => {
          <div className="main">
             <div className="main__header">
                <h2>Global Chat</h2>
-               <button onClick={() => pushNotifications.broadcast()}>broadcast</button>
             </div>
             <div className="main__body">
                {errorCode !== 0 && <div className="main__error">Waiting for network...</div>}
