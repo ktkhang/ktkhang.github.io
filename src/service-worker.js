@@ -126,7 +126,8 @@ self.addEventListener('sync', (event) => {
          const pendingMessages = messages.filter((message) => message.status === 'sending');
          if (pendingMessages?.length) {
             self.registration.showNotification(`Messages synced`, {
-               icon: '/logo192.png',
+               icon: '/18.png',
+               badge: '/14.png',
                body: 'Your messages have been synced.',
                data: {
                   url: 'https://ktkhang.github.io/',
