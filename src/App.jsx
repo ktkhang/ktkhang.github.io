@@ -8,6 +8,7 @@ import Main from './components/Main';
 import localforage from 'localforage';
 import './scss/styles.scss';
 import { DEVICE_ID_VARIABLE } from './constants/variables';
+import AESWrapper from './lib/aes/AESWrapper';
 
 const App = () => {
    const [userInfo, setUserInfo] = useRecoilState(userInfoState);
@@ -25,17 +26,7 @@ const App = () => {
          }
          setLoading(false);
       };
-      // const requestNotiPermission = () => {
-      //    Notification.requestPermission().then(function (permission) {
-      //       if (permission === 'granted') {
-      //          console.log('Notification permission granted.');
-      //       } else {
-      //          console.log('Unable to get permission to notify.');
-      //       }
-      //    });
-      // };
 
-      // requestNotiPermission();
       init();
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
@@ -43,7 +34,15 @@ const App = () => {
    console.log(userInfo);
    return (
       <div className="App">
-         {loading ? <>Loading...</> : userInfo ? <Main /> : <LoginForm />}
+         {loading ? (
+            <>Loading...</>
+         ) : userInfo ? (
+            <AESWrapper>
+               <Main />
+            </AESWrapper>
+         ) : (
+            <LoginForm />
+         )}
       </div>
    );
 };

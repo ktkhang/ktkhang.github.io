@@ -1,11 +1,6 @@
 import { useSetRecoilState } from 'recoil';
 import MessageStatus from '../enums/MessageStatus';
-import {
-   chatLogState,
-   messagesState,
-   socketState,
-   typingUsersState,
-} from '../store/atoms';
+import { chatLogState, messagesState, socketState, typingUsersState } from '../store/atoms';
 import { getSavedDeviceId, uuidv4 } from '../utils/common';
 
 const useSocketHandler = () => {
@@ -45,8 +40,7 @@ const useSocketHandler = () => {
       setMessages((prevMessages) => {
          let deliveredMessages = prevMessages.filter(
             (msg) =>
-               msg.status === MessageStatus.SENDING &&
-               msgList.some((m) => m.resolvedId === msg.id)
+               msg.status === MessageStatus.SENDING && msgList.some((m) => m.resolvedId === msg.id)
          );
          const retainedMessages = prevMessages.filter(
             (msg) => !deliveredMessages.some((m) => m.id === msg.id)
@@ -112,7 +106,7 @@ const useSocketHandler = () => {
    };
 
    // handle close
-   const handleClose = (retryCallback) => (e) => {
+   const handleClose = (e) => {
       setSocketState((prev) => ({ ...prev, errorCode: e.code !== 1005 ? e.code : 0 }));
    };
 

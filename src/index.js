@@ -19,7 +19,7 @@ if (pushNotifications.isSupported()) {
    pushNotifications.registerServiceWorker();
    pushNotifications.requestPermission().then((permission) => {
       if (permission === 'granted') {
-         pushNotifications.send();
+         // pushNotifications.send();
       }
    });
 }

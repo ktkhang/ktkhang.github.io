@@ -123,9 +123,7 @@ self.addEventListener('sync', (event) => {
          // sync pending messages
          // if (event.tag === SYNC_PENDING_MESSAGE_TAG) {
          const messages = await localforage.getItem(LOCAL_MESSAGES);
-         const pendingMessages = messages.filter(
-            (message) => message.status === 'sending'
-         );
+         const pendingMessages = messages.filter((message) => message.status === 'sending');
          if (pendingMessages?.length) {
             self.registration.showNotification(`Messages synced`, {
                icon: '/logo192.png',

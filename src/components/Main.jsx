@@ -2,6 +2,7 @@ import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { config } from '../constants/confjg';
 import useSocketHandler from '../hooks/useSocketHandler';
+import withSignalProtocolManager from '../lib/e2ee/SignalProtocolManager';
 import WebSocketProvider from '../lib/websocket/WebSocketProvider';
 import { socketState } from '../store/atoms';
 import BackgroundSync from './BackgroundSync';
@@ -28,9 +29,7 @@ const Main = () => {
                <h2>Global Chat</h2>
             </div>
             <div className="main__body">
-               {errorCode !== 0 && (
-                  <div className="main__error">Waiting for network...</div>
-               )}
+               {errorCode !== 0 && <div className="main__error">Waiting for network...</div>}
                <ChatContent />
                <ChatBox />
             </div>
@@ -41,4 +40,4 @@ const Main = () => {
    );
 };
 
-export default Main;
+export default withSignalProtocolManager()(Main);
