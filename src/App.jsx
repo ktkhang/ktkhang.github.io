@@ -2,16 +2,18 @@ import { useEffect, useState } from 'react';
 import LoginForm from './components/LoginForm';
 import { userService } from './services/userService';
 import { getDeviceId } from './utils/common';
-import { useRecoilState } from 'recoil';
-import { userInfoState } from './store/atoms';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { commonState, userInfoState } from './store/atoms';
 import Main from './components/Main';
 import localforage from 'localforage';
 import './scss/styles.scss';
 import { DEVICE_ID_VARIABLE } from './constants/variables';
 import AESWrapper from './lib/aes/AESWrapper';
+import pushNotifications from './pushNotifications';
 
 const App = () => {
    const [userInfo, setUserInfo] = useRecoilState(userInfoState);
+   const setCommonState = useSetRecoilState(commonState);
    const [loading, setLoading] = useState(true);
 
    useEffect(() => {
@@ -28,6 +30,11 @@ const App = () => {
       };
 
       init();
+      if (pushNotifications.isSupported()) {
+         pushNotifications.requestPermission().then((permission) => {
+            setCommonState(permission);
+         });
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
 

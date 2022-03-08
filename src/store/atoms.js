@@ -4,6 +4,12 @@ export const userInfoState = atom({
    key: 'userInfoState',
    default: null,
 });
+export const commonState = atom({
+   key: 'commonState',
+   default: {
+      permission: '',
+   },
+});
 
 export const chatLogState = atom({
    key: 'chatLogState',

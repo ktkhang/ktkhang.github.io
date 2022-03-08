@@ -1,4 +1,5 @@
 import { config } from '../constants/confjg';
+import { getSavedDeviceId } from '../utils/common';
 
 const subscribe = (subscription) => {
    return fetch(`${config.API_URL}/subscription`, {
@@ -6,7 +7,10 @@ const subscribe = (subscription) => {
       headers: {
          'Content-Type': 'application/json',
       },
-      body: JSON.stringify(subscription),
+      body: JSON.stringify({
+         deviceId: getSavedDeviceId(),
+         subscription,
+      }),
    })
       .then((response) => response.json())
       .catch((error) => {

@@ -52,13 +52,11 @@ const publicVapidKey =
 
 const subscribe = async () => {
    const registration = await navigator.serviceWorker.ready;
-   console.log(registration);
    // Subscribe to push notifications
    const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: util.urlBase64ToUint8Array(publicVapidKey),
    });
-   console.log(subscription);
    const response = await pushService.subscribe(subscription);
    console.log(response);
 };
