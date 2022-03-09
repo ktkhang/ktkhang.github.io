@@ -1,8 +1,15 @@
 import CryptoJS from 'crypto-js';
+import scrypt from 'scrypt-js';
+import util from '../../utils/util';
 
-const SALT_LENGTH = 16;
-const IV_LENGTH = 16;
-const AES_KEY_SIZE = 256 / 32;
+const SALT_SIZE = 128;
+const IV_SIZE = 128;
+// const AES_KEY_SIZE = 256;
+// const KDF_ITERATIONS = 5000;
+const N = 1024; // increases both memory usage and iterations - CPU/memory cost parameter
+const r = 8; // increases memory usage.
+const p = 1; // parallelization factor. Always set = 1
+const dkLen = 32; // desired key length in bytes
 
 class AES {
    #salt = null;
@@ -10,18 +17,28 @@ class AES {
    #key = null;
    #secret = null;
    constructor(secret) {
-      this.#secret = secret;
-      this.#salt = CryptoJS.lib.WordArray.random(SALT_LENGTH);
-      this.#iv = CryptoJS.lib.WordArray.random(IV_LENGTH);
-      this.#key = CryptoJS.PBKDF2(secret, this.#salt, {
-         keySize: AES_KEY_SIZE,
-         iterations: 10000,
-         hasher: CryptoJS.algo.SHA256,
-      });
+      this.#secret = CryptoJS.enc.Base64.parse(secret);
+      this.#salt = CryptoJS.lib.WordArray.random(SALT_SIZE / 8);
+      this.#iv = CryptoJS.lib.WordArray.random(IV_SIZE / 8);
+      // this.#key = CryptoJS.PBKDF2(secret, this.#salt, {
+      //    keySize: AES_KEY_SIZE,
+      //    iterations: KDF_ITERATIONS,
+      //    hasher: CryptoJS.algo.SHA256,
+      // });
+      this.#key = CryptoJS.lib.WordArray.create(
+         scrypt.syncScrypt(
+            util.convertWordArrayToUint8Array(this.#secret),
+            util.convertWordArrayToUint8Array(this.#salt),
+            N,
+            r,
+            p,
+            dkLen
+         )
+      );
    }
 
-   encrypt = (message) => {
-      const encrypted = CryptoJS.AES.encrypt(message, this.#key, {
+   encrypt = (value) => {
+      const encrypted = CryptoJS.AES.encrypt(value, this.#key, {
          iv: this.#iv,
       }).ciphertext;
       const concatennedCipher = CryptoJS.lib.WordArray.create()
@@ -29,30 +46,41 @@ class AES {
          .concat(this.#iv)
          .concat(encrypted);
 
-      return concatennedCipher.toString(CryptoJS.enc.Base64);
+      const encryptedValue = concatennedCipher.toString(CryptoJS.enc.Base64);
+
+      return encryptedValue;
    };
 
-   decrypt = (cipherMessage) => {
-      const encrypted = CryptoJS.enc.Base64.parse(cipherMessage);
-      const salt = CryptoJS.lib.WordArray.create(encrypted.words.slice(0, SALT_LENGTH / 4));
+   decrypt = (cipher) => {
+      const encrypted = CryptoJS.enc.Base64.parse(cipher);
+      const salt = CryptoJS.lib.WordArray.create(encrypted.words.slice(0, SALT_SIZE / 8 / 4));
       const iv = CryptoJS.lib.WordArray.create(
-         encrypted.words.slice(0 + SALT_LENGTH / 4, (SALT_LENGTH + IV_LENGTH) / 4)
+         encrypted.words.slice(0 + SALT_SIZE / 8 / 4, (SALT_SIZE / 8 + IV_SIZE / 8) / 4)
       );
-      const key = CryptoJS.PBKDF2(this.#secret, salt, {
-         keySize: AES_KEY_SIZE,
-         iterations: 10000,
-         hasher: CryptoJS.algo.SHA256,
-      });
+      // const key = CryptoJS.PBKDF2(this.#secret, salt, {
+      //    keySize: AES_KEY_SIZE,
+      //    iterations: KDF_ITERATIONS,
+      //    hasher: CryptoJS.algo.SHA256,
+      // });
+      const key = CryptoJS.lib.WordArray.create(
+         scrypt.syncScrypt(
+            util.convertWordArrayToUint8Array(this.#secret),
+            util.convertWordArrayToUint8Array(salt),
+            N,
+            r,
+            p,
+            dkLen
+         )
+      );
       const decrypted = CryptoJS.AES.decrypt(
          {
             ciphertext: CryptoJS.lib.WordArray.create(
-               encrypted.words.slice((SALT_LENGTH + IV_LENGTH) / 4)
+               encrypted.words.slice((SALT_SIZE / 8 + IV_SIZE / 8) / 4)
             ),
          },
          key,
-         { iv: iv }
+         { iv }
       );
-
       return decrypted.toString(CryptoJS.enc.Utf8);
    };
 }

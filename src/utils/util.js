@@ -58,12 +58,53 @@ const urlBase64ToUint8Array = (base64String) => {
    return outputArray;
 };
 
+const convertWordArrayToUint8Array = (wordArray) => {
+   let len = wordArray.words.length,
+      u8_array = new Uint8Array(len << 2),
+      offset = 0,
+      word,
+      i;
+   for (i = 0; i < len; i++) {
+      word = wordArray.words[i];
+      u8_array[offset++] = word >> 24;
+      u8_array[offset++] = (word >> 16) & 0xff;
+      u8_array[offset++] = (word >> 8) & 0xff;
+      u8_array[offset++] = word & 0xff;
+   }
+   return u8_array;
+};
+const convertUint8ArrayToWordArray = (u8Array) => {
+   let words = [],
+      i = 0,
+      len = u8Array.length;
+
+   while (i < len) {
+      words.push((u8Array[i++] << 24) | (u8Array[i++] << 16) | (u8Array[i++] << 8) | u8Array[i++]);
+   }
+
+   return {
+      sigBytes: words.length * 4,
+      words: words,
+   };
+};
+
+const stringToUint8Array = (str) => {
+   const arr = new Uint8Array(str.length);
+   for (let i = 0; i < str.length; i++) {
+      arr[i] = str.charCodeAt(i);
+   }
+   return arr;
+};
+
 const util = {
    arrayBufferToBase64,
    base64ToArrayBuffer,
    toString,
    toArrayBuffer,
    urlBase64ToUint8Array,
+   convertWordArrayToUint8Array,
+   convertUint8ArrayToWordArray,
+   stringToUint8Array,
 };
 
 export default util;

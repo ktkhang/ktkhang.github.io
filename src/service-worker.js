@@ -175,16 +175,13 @@ self.addEventListener('push', (e) => {
 });
 
 self.addEventListener('notificationclick', (e) => {
-   const notification = e.notification;
-
    e.waitUntil(
       (async () => {
          const client = await firstWindowClient();
          if (client) {
             client.focus();
          } else {
-            const options = notification.data.options;
-            self.clients.openWindow(options.url);
+            self.clients.openWindow('https://ktkhang.github.io/');
          }
          e.notification.close();
       })()
