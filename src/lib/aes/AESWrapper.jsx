@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, memo } from 'react';
+import React, { useState, useEffect, useContext, memo, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userInfoState } from '../../store/atoms';
 import AES from './aes';
@@ -34,10 +34,13 @@ const AESWrapper = memo((props) => {
 export const useAES = () => {
    const { AES } = useContext(AESContext);
 
-   return {
-      encrypt: AES?.encrypt,
-      decrypt: AES?.decrypt,
-   };
+   return useMemo(
+      () => ({
+         encrypt: AES?.encrypt,
+         decrypt: AES?.decrypt,
+      }),
+      [AES]
+   );
 };
 
 export default AESWrapper;

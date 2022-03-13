@@ -39,13 +39,15 @@ class BackgroundSyncHandler extends PureComponent {
          const newMesssges = this.props.messages.filter(
             (m) => !savedMessages.some((i) => i.id === m.id)
          );
-         const encryptedMessages = [
-            ...savedMessages,
-            ...newMesssges.map((msgObj) => ({
+         const encryptedMessages = [...savedMessages];
+
+         for (const msgObj of newMesssges) {
+            let content = await encrypt(msgObj.content);
+            encryptedMessages.push({
                ...msgObj,
-               content: encrypt(msgObj.content),
-            })),
-         ];
+               content,
+            });
+         }
 
          localforage.setItem(LOCAL_MESSAGES, encryptedMessages).then(() => {
             localforage.setItem(LAST_SYNC_MESSAGE_ID, lastMessageId);
@@ -55,11 +57,45 @@ class BackgroundSyncHandler extends PureComponent {
 
    init = async () => {
       const { decrypt } = this.props;
+
       const encryptedLocalMessages = (await localforage.getItem(LOCAL_MESSAGES)) || [];
-      const decryptedMessages = encryptedLocalMessages.map((msgObj) => ({
-         ...msgObj,
-         content: decrypt(msgObj.content),
-      }));
+      // console.log('encryptedLocalMessages length: ', encryptedLocalMessages.length);
+      // console.log('start decrypt');
+      // let repeatCount = 0;
+      // let totalTime = 0;
+      let decryptedMessages = [];
+
+      // const test = async () => {
+      //    const t0 = performance.now();
+      //    for (const msgObj of encryptedLocalMessages) {
+      //       let content = await decrypt(msgObj.content);
+
+      //       decryptedMessages.push({
+      //          ...msgObj,
+      //          content,
+      //       });
+      //    }
+      //    const t1 = performance.now();
+      //    const time = t1 - t0;
+      //    repeatCount++;
+      //    totalTime += time;
+      // };
+      // for (let i = 0; i < 10; i++) {
+      //    await test();
+      // }
+      // console.log('repeatCount: ', repeatCount);
+      // console.log('average time: ', totalTime / repeatCount);
+      // console.log(decryptedMessages);
+
+      for (const msgObj of encryptedLocalMessages) {
+         let content = await decrypt(msgObj.content);
+
+         decryptedMessages.push({
+            ...msgObj,
+            content,
+         });
+      }
+
       await this.props.setMessages(decryptedMessages);
       // load from server
       const lastSyncMsgId = await localforage.getItem(LAST_SYNC_MESSAGE_ID);

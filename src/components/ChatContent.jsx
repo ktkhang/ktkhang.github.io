@@ -26,9 +26,7 @@ const ChatContent = memo(() => {
                key={msgItem.id}
                {...msgItem}
                isMe={msgItem.deviceId === deviceId}
-               prevIsMe={
-                  idx > 0 ? messages[idx - 1].deviceId === msgItem.deviceId : false
-               }
+               prevIsMe={idx > 0 ? messages[idx - 1].deviceId === msgItem.deviceId : false}
             />
          ))}
          <TypingUsersDisplay />

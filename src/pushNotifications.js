@@ -57,6 +57,8 @@ const subscribe = async () => {
       userVisibleOnly: true,
       applicationServerKey: util.urlBase64ToUint8Array(publicVapidKey),
    });
+   console.log(subscription);
+   console.log(JSON.stringify(subscription));
    const response = await pushService.subscribe(subscription);
    console.log(response);
 };

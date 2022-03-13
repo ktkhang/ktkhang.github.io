@@ -10,7 +10,6 @@
     "@testing-library/user-event": "^13.5.0",
     "crypto-js": "^4.1.1",
     "gh-pages": "^3.2.3",
-    "jsencrypt": "^3.2.1",
     "localforage": "^1.10.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.34",
@@ -19,7 +18,6 @@
     "react-scripts": "5.0.0",
     "recoil": "^0.6.1",
     "sass": "^1.49.7",
-    "scrypt-js": "^3.0.1",
     "web-vitals": "^2.1.4"
   },
   "main": "src/electron-starter.js",

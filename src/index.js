@@ -17,13 +17,13 @@ ReactDOM.render(
 
 if (pushNotifications.isSupported()) {
    pushNotifications.registerServiceWorker();
-   pushNotifications.requestPermission().then((permission) => {
-      console.log(permission);
-      if (permission === 'granted') {
-         // pushNotifications.send();
-         pushNotifications.subscribe();
-      }
-   });
+   // pushNotifications.requestPermission().then((permission) => {
+   //    console.log(permission);
+   //    if (permission === 'granted') {
+   //       // pushNotifications.send();
+   //       pushNotifications.subscribe();
+   //    }
+   // });
 }
 
 // If you want to start measuring performance in your app, pass a function

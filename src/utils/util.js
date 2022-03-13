@@ -1,3 +1,5 @@
+import SHA256 from '../lib/sha256';
+
 /* eslint-disable no-undef */
 const arrayBufferToBase64 = (buffer) => {
    let binary = '';
@@ -10,13 +12,17 @@ const arrayBufferToBase64 = (buffer) => {
 };
 
 const base64ToArrayBuffer = (base64) => {
+   return base64ToUint8Array(base64).buffer;
+};
+
+const base64ToUint8Array = (base64) => {
    let binaryStr = window.atob(base64);
    let len = binaryStr.length;
-   let bytes = new Uint8Array(len);
+   let outputArray = new Uint8Array(len);
    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryStr.charCodeAt(i);
+      outputArray[i] = binaryStr.charCodeAt(i);
    }
-   return bytes.buffer;
+   return outputArray;
 };
 
 const toString = (thing) => {
@@ -88,23 +94,35 @@ const convertUint8ArrayToWordArray = (u8Array) => {
    };
 };
 
-const stringToUint8Array = (str) => {
-   const arr = new Uint8Array(str.length);
-   for (let i = 0; i < str.length; i++) {
-      arr[i] = str.charCodeAt(i);
+//
+const utf8ToUint8Array = (input) => {
+   return new TextEncoder().encode(input);
+};
+const arrayBufferToUtf8 = (input) => {
+   return new TextDecoder().decode(new Uint8Array(input));
+};
+
+const arrayBufferToHex = (input) => {
+   const uint8ArrayInput = new Uint8Array(input);
+   const output = [];
+   for (let i = 0; i < uint8ArrayInput.length; ++i) {
+      output.push(uint8ArrayInput[i].toString(16).padStart(2, '0'));
    }
-   return arr;
+   return output.join('');
 };
 
 const util = {
    arrayBufferToBase64,
    base64ToArrayBuffer,
+   base64ToUint8Array,
    toString,
    toArrayBuffer,
    urlBase64ToUint8Array,
    convertWordArrayToUint8Array,
    convertUint8ArrayToWordArray,
-   stringToUint8Array,
+   utf8ToUint8Array,
+   arrayBufferToUtf8,
+   arrayBufferToHex,
 };
 
 export default util;
