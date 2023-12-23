@@ -4,13 +4,6 @@ object-assign
 @license MIT
 */
 
-/*!
-    localForage -- Offline Storage, Improved
-    Version 1.10.0
-    https://localforage.github.io/localForage
-    (c) 2013-2017 Mozilla, Apache License 2.0
-*/
-
 /** @license React v0.20.2
  * scheduler.production.min.js
  *
@@ -46,15 +39,3 @@ object-assign
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
-//! Copyright (c) JS Foundation and other contributors
-
-//! github.com/moment/moment-timezone
-
-//! license : MIT
-
-//! moment-timezone.js
-
-//! moment.js
-
-//! version : 0.5.34
