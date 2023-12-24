@@ -1,5 +1,5 @@
 
-body {
+#root {
   height: 100vh;
   height: 100svh;
   display: grid;
@@ -125,3 +125,86 @@ aside div {
     font-size: 12px;
   }
 }
+
+
+
+.text-box {
+  position: absolute;
+  right: 80px;
+  bottom: 80px;
+}
+
+.btn {
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 12px;
+  display: inline-block;
+  border-radius: 50%;
+  transition: all .2s;
+  position: absolute;
+  border: none;
+  color: hsl(193.06deg 70% 50%);;
+  cursor: pointer;
+  display: grid;
+  svg {
+    transition: rotate .5s ease;
+  }
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  svg {
+    rotate: -115deg;
+  }
+}
+
+.btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-white {
+  background-color: rgb(47 47 47 / 85%);
+  color: hsl(193.06deg 70% 50%);
+}
+
+.btn::after {
+  content: "";
+  display: inline-block;
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  transition: all .4s;
+}
+
+.btn-white::after {
+  background-color: rgb(47 47 47 / 100%);
+}
+
+.btn:hover::after {
+  transform: scaleX(1.4) scaleY(1.6);
+  opacity: 0;
+}
+
+.btn-animated {
+  animation: moveInBottom 5s ease-out;
+  animation-fill-mode: backwards;
+}
+
+@keyframes moveInBottom {
+  0% {
+      opacity: 0;
+      transform: translateY(30px);
+  }
+
+  100% {
+      opacity: 1;
+      transform: translateY(0px);
+  }
+}
+
