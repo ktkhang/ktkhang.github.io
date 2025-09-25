@@ -12,8 +12,10 @@ const randomInRange = (min, max) => {
 
 const pickEmoji = () => {
    return pickRandom([
-      '4🎅',
-      '2🎁',
+      '21',
+      '09',
+      '🎅',
+      '🎁',
       '⛄',
       '❄️',
       '🌟',
@@ -49,7 +51,7 @@ const App = () => {
    }, []);
 
    const drawTree = useCallback((_baubles) => {
-      const baubles = _baubles || document.querySelectorAll('li');
+      const baubles = document.querySelectorAll('li');
       const baublesLength = baubles.length;
 
       baubles.forEach((bauble, i) => {
@@ -126,11 +128,11 @@ const App = () => {
    return (
       <>
          <div className='title'>
-            <h1>
-            {
-               !!(randCount % 2 === 0) ? 'Merry Christmas - from kt.khang with ❤️':
-               'Happy new year 2024 🍷'
-            }
+            <h1>'Happy Birthday Minh Anh 👌 - from Khang Lê hehe'
+            {/* {
+               !!(randCount % 2 === 0) ? 'Happy Birthday MINH ANH 👌':
+               'from Khang Lê he he'
+            } */}
                </h1>
          </div>
          <div className='text-box'>
